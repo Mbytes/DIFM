@@ -4,10 +4,10 @@
 #DI.FM Recupera canales y emite
 
 #URL Servidor
-URL=http://pub7.di.fm/
+URL=pub7.di.fm
 
-CHANNELS=$(curl -s  pub7.di.fm)
-
+#String identificador punto montaje
+CHANPOINT='Mount Point.*<'
 
 #Control Numero parametros
 if test $# -ne 1
@@ -17,11 +17,17 @@ else
   BUSCA=$1
 fi
 
+
 #Recupera listado Canales, buscando "Mount Point"
 function Canales ()
 {
-  echo "${CHANNELS}" | sed -e 's/h3/\'$'\n/g' |  grep 'Mount Point.*<' | awk '{print $NF}' |sed -e 's/<\///g' | grep "flv$" 
+#Recuperamos Lista Canales
+CHANNELS=$(curl -s  "${URL}")
+
+#Devolvemos limpio
+echo "${CHANNELS}" | sed -e 's/h3/\'$'\n/g' |  grep "${CHANPOINT}" | awk '{print $NF}' |sed -e 's/<\///g' | grep "flv$" 
 }
+
 
 function AlertSelect()
 {
@@ -71,7 +77,7 @@ fi
 
 echo "Seleccionado canal ${SELECT}"
 
-mplayer http://pub7.di.fm/${SELECT}?1 -user-agent "AudioAddict-di/3.2.0.3240 Android/5.1"
+mplayer http://${URL}/${SELECT}?1 -user-agent "AudioAddict-di/3.2.0.3240 Android/5.1"
 
 exit
 
